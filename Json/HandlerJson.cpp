@@ -1,11 +1,14 @@
 #include "HandlerJson.hpp"
+#include <iostream>
+#include <fstream>
+#include <string>
 
 JHR::HandlerJson::HandlerJson() :
     json_type(""),
     data_server(nullptr) {}
 
-void JHR::HandlerJson::json_converter(char* json_buffer)
-{
+void JHR::HandlerJson::json_converter(const std::string& json_buffer)
+{   
     data_server = json::parse(json_buffer);
 }
 
@@ -15,11 +18,31 @@ void JHR::HandlerJson::read_json_file(const std::string& file_name)
     fh->read_file(file_name);
 
     if(fh->get_buffer() != nullptr){
+        json_converter(std::string(fh->get_buffer(), fh->get_size()));
+    }
+    delete fh;
+    return;
+}
+
+/*
+void JHR::HandlerJson::json_converter(char* json_buffer)
+{   
+    data_server = json::parse(json_buffer);
+}
+
+void JHR::HandlerJson::read_json_file(const std::string& file_name)
+{
+    FH::FileHandler* fh = new FH::FileHandler();
+    fh->read_file(file_name);
+
+
+    if(fh->get_buffer() != nullptr){
         json_converter(fh->get_buffer());
     }
     delete fh;
     return;
 }
+*/
 
 void JHR::HandlerJson::save_json_file(const std::string& file_name)
 {

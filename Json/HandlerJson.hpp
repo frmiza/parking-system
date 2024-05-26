@@ -16,14 +16,15 @@ namespace JHR
         std::string json_type;
         json data_server;
 
-        virtual void json_deserializer(json json_data) = 0;
-        template<typename T> const char* json_serializer(T t);
-
     public:
         HandlerJson();
-        void json_converter(char* json_buffer);
+        virtual void json_deserializer(json json_data) = 0;
+        template<typename T> const char* json_serializer(T t);
+        
+        void json_converter(const std::string& json_buffer);
         void read_json_file(const std::string& file_name);
         void save_json_file(const std::string& file_name);
+        
         void treat_json_file(const std::string& file_name);
         void treat_json_buffer(char* json_buffer);
 
