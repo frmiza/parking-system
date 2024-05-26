@@ -38,7 +38,7 @@ void FH::FileHandler::save_file(const std::string& file_name, char* buffer_to_sa
 {
     std::ofstream file(file_name);
     if (file.is_open()) {
-        file << buffer_to_save;
+        file << std::setw(4) << buffer_to_save;
         file.close();
     }
 }
