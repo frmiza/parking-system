@@ -1,7 +1,7 @@
 #ifndef SERVER_HPP
 #define SERVER_HPP
 
-#include "../SwLibNet.hpp"
+#include "../Socket/SwLibSocks.hpp"
 
 
 namespace SW
@@ -16,7 +16,7 @@ namespace SW
         //virtual void responser_con() = 0;
 
     public:
-        // Construtor
+        // ConstrutorS
         Server(int backlog, u_int port, u_long ip_address = INADDR_ANY,
             int domain = AF_INET, int  type = SOCK_STREAM, int protocol = IPPROTO_TCP);
         

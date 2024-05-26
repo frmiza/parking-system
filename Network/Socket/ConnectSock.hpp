@@ -15,7 +15,7 @@ namespace SW
     public:
 
         // Construtor
-        ConnectSock(u_short port_to_connect, const char* ip_address_to_connect,
+        ConnectSock(u_short port_to_connect, std::string ip_address_to_connect,
             int domain = AF_INET, int type = SOCK_STREAM, int protocol = IPPROTO_TCP);
         
         //Gets

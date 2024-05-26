@@ -1,28 +1,22 @@
 #include "ClientDistribuido.hpp"
-#include <unistd.h>
-#define ip_serv "127.0.0.1"
 
-
-using json = nlohmann::json;
-
-
-SW::ClientDistribuido::ClientDistribuido() : Client(4001,ip_serv, AF_INET, SOCK_STREAM,IPPROTO_TCP)
+SW::ClientDistribuido::ClientDistribuido(struct shared_data_client sdc, std::mutex& mutex_floor, 
+                u_int port_to_connect, std::string ip_address_to_connect, int domain, int type, int protocol) : 
+                Client(port_to_connect, ip_address_to_connect, domain, type, protocol),
+                c_shared_data(sdc), c_data_mutex(mutex_floor)
 {   
     std::cout << "Iniciando Cliente..." << std::endl;
+    
     launch();
 }
 
 void SW::ClientDistribuido::connecter(){
 
     int s_sock = get_socket()->get_s_sock();
-    //struct sockaddr_in address = get_socket()->get_addr();
-    //int addrlen = sizeof(address);
-      
+
     try
     {   
         std::cout << "Se conectando ao servidor..." << std::endl;
-        //svr_sock = connect(get_socket()->get_s_sock(), (sockaddr *)&address, sizeof(address));
-        //get_socket()->check(svr_sock);
         handler_con(s_sock);
     }
     catch(const std::exception& e)
@@ -32,43 +26,23 @@ void SW::ClientDistribuido::connecter(){
 }
 
 void SW::ClientDistribuido::handler_con(int svr_sock){
-
-    std::cout << "Aguardando dados do servidor...\n" << std::endl;
     
-    const char* msg = "Ola servidor, mensagem do cliente...\n";
-    if(send(svr_sock, msg, strlen(msg),0) != strlen(msg)){
-        std::cout << (stderr, "Erro ao enviar mensagem: %s\n", strerror(errno));
+    json json_buffer;
+    JHR::JsonData* json_bh = new JHR::JsonData;
+    std::string json_string;
+
+    {   
+        std::lock_guard<std::mutex> lock(c_data_mutex);
+        struct shared_data_client aux_sdc = read_shared_data_client(c_shared_data); 
+        json_buffer = json_bh->json_serializer(aux_sdc.origin, aux_sdc.num_occupied, aux_sdc.park_spaces,
+        aux_sdc.rs_floor_signal, aux_sdc.dw_floor_signal, aux_sdc.open_floor_signal);
+        json_string = json_buffer.dump();
+    }
+
+    if(send(svr_sock, json_string.c_str(), json_string.length(), 0) != json_string.length()){
+        close(svr_sock);
         exit(EXIT_FAILURE);
     }
-
-    size_t lenmsg;
-    char buffer[4096] = {0};
-    memset(buffer, 0, sizeof(buffer));
-    if((lenmsg = recv(svr_sock,buffer,4096,0)) <= 0){
-        std::cout << "Erro ao recever mensagem mensagem" << std::endl;
-    exit(EXIT_FAILURE);
-    }
-    //std::cout << "Received: " << buffer << std::endl;
-    
-    json received_json;
-    try 
-    {
-        received_json = json::parse(buffer);
-    } catch (const std::exception& e) {
-        std::cerr << "erro ao analisar o json recebido: " << e.what() << std::endl;
-    }
-    std::cout << "JSON recebido:\n" << received_json.dump(4) << std::endl;
-
-    //json j = {
-    //    {"nome", "João"},
-    //    {"idade", 30},
-    //    {"solteiro", true}
-    //};
-
-    //std::string json_string = j.dump();
-    // Exemplo de resposta
-    //const char* response = "HTTP/1.1 200 OK\r\nContent-Length: 13\r\n\r\nHello, World!";
-    //send(svr_sock, json_string.c_str(), json_string.length(), 0);
 
     close(svr_sock);  // Fechar o socket após o processamento
     return;

@@ -1,7 +1,7 @@
 #include "ConnectSock.hpp"
 
 // Construtor
-SW::ConnectSock::ConnectSock(u_short port_to_connect, const char* ip_address_to_connect, int domain,
+SW::ConnectSock::ConnectSock(u_short port_to_connect, std::string ip_address_to_connect, int domain,
              int type, int protocol) : Ssock(domain, type, protocol)
 { 
     set_ip(ip_address_to_connect);

@@ -1,6 +1,6 @@
 #include "Client.hpp"
 
-SW::Client::Client(u_int port_to_connect, const char* ip_address_to_connect,
+SW::Client::Client(u_int port_to_connect, std::string ip_address_to_connect,
                     int domain, int type, int protocol)
 {
     socket = new ConnectSock(port_to_connect, ip_address_to_connect, domain, type, protocol);

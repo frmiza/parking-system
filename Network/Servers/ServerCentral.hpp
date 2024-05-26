@@ -2,8 +2,8 @@
 #define SERVERCENTRAL_HPP
 
 #include "Server.hpp"
-#include <vector>
-#include <thread>
+#include "../../Json/JsonHdrLib.hpp"
+
 
 namespace SW
 {
@@ -18,9 +18,10 @@ namespace SW
     
         virtual void accepter()  override;
         virtual void handler_con(int c_sock) override;
-        //virtual void responser_con() = 0;
     public:
-        ServerCentral();
+        ServerCentral(int backlog, u_int port, u_long ip_address = INADDR_ANY,
+            int domain = AF_INET, int  type = SOCK_STREAM, int protocol = IPPROTO_TCP);
+        static void* handler_con_static(void* p_client);
         void launch();
     };
 }
